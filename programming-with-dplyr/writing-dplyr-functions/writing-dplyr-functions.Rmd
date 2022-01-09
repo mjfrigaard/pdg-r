@@ -1,0 +1,207 @@
+---
+title: "Writing functions with with `dplyr`"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    default_style: "light"
+    downcute_theme: "default"
+---
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(skimr)
+# chunk options ----
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE,
+                      tidy = FALSE,
+                      fig.path = "img/")
+# base options ----
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78,
+  scipen = 100000000,
+  max.print = 999999
+)
+```
+
+
+```{r , echo=FALSE}
+# xaringan::inf_mr()
+```
+
+
+## Programming with `dplyr` (vignette)
+
+The vignette, 'programming with `dplyr`' gives us a lot of information on how to use `dplyr` to write functions: 
+
+We'll create a test data frame to play with for these functions:
+
+```{r create-df}
+DFX <- data.frame(a = rep(LETTERS[1:5], 2),
+                  b = sample(LETTERS[1:2], 10, replace = TRUE),
+                  c = sample(LETTERS[1:5], 10, replace = TRUE),
+                  x = 1:10, 
+                  y = rep(seq(2, 10, by = 2), 2), 
+                  z = sample(1:10, 10, replace = FALSE))
+DFX
+DFY <- data.frame(A = rep(LETTERS[1:5], 2),
+                  B = sample(LETTERS[1:2], 5, replace = TRUE),
+                  C = sample(LETTERS[1:5], 10, replace = TRUE),
+                  X = 1:10, 
+                  Y = rep(seq(2, 10, by = 2), 2), 
+                  Z = sample(1:10, 10, replace = FALSE))
+DFY
+```
+
+
+## Data masking, env-variables, and indirection
+
+This is an example of how masking works--the following code places two logical conditions in the 'row' position of the brackets. 
+
+```{r bracket-subsetting}
+DFX[DFX$a == "b" | DFX$x == 2, ]
+```
+
+`dplyr` makes this code more 'pipepable' and easier to read. 
+
+```{r dplyr-subsetting}
+DFX %>% filter(a == "b" | x == 2)
+```
+
+
+## `env-` vs. `data-` variables 
+
+> `env-variables` are “programming” variables that ***live in an environment***. They are usually created with `<-`
+
+we created the `df`s with `<-`, so it's in our environment:
+
+```{r}
+ls()
+```
+
+
+> `data-variables` are “statistical” variables that ***live in a data frame***. They usually come from data files (e.g. `.csv`, `.xls`), or are created manipulating existing variables.
+
+```{r data-variables}
+DFX$x
+```
+ 
+We now have an **env- variable** (the `DFX` `tibble`s), and four new `data-` variables (the columns in `DFX`s)
+
+### Embracing 
+
+If we want to refer to an **data- variable** in a function (i.e. refer to a column inside the 'data' we supply), we need to use the 'embrace' syntax: 
+
+```{r var_summary}
+var_summary <- function(data, var) {
+  data %>%
+    summarise(n = n(), 
+              # the 'embrace' is enclosed in two 
+              # double-brackets {{}}
+              min = min({{ var }}), 
+              max = max({{ var }})
+              )
+}
+```
+
+
+We can test this with `DFY`
+
+```{r test-var_summary}
+DFY %>% 
+  group_by(B) %>% 
+  var_summary(Z)
+```
+
+And we can extend `{{ var }}` to include multiple columns that come from the `env-` variable, 
+
+```{r var_group_summary}
+var_group_summary <- function(data, grpvar, sumvar) {
+  data %>%
+        # include a group variable
+    group_by({{ grpvar }}) %>% 
+    summarise(n = n(), 
+              # and a summary variable
+              min = min({{ sumvar }}), 
+              max = max({{ sumvar }})
+              )
+}
+```
+
+```{r test-var_group_summary}
+DFY %>% 
+    var_group_summary(data = ., grpvar = B, sumvar = Z)
+```
+
+
+### Embrace with `.data[[]]`
+
+If we want to make a new variable that pastes together any six possible columns
+
+```{r create_new_column}
+create_join_column <- function(df, join_cols, new_col_name){
+  # select by_vars
+  tmp <- select(df, all_of(join_cols))
+  # rename data 
+  join_col_data <- df
+  # assign new col
+  join_col_data$new_col <- pmap_chr(.l = tmp, .f = paste, sep = "-")
+  # rename 
+  names(join_col_data)[names(join_col_data) == "new_col"] <- new_col_name
+  # relocate
+  join_col_data <- relocate(join_col_data, all_of(new_col_name))
+  # return
+  return(join_col_data)
+}
+```
+
+
+```{r dfx_2newcol}
+dfx_2newcol <- create_join_column(df = DFX, 
+                                  join_cols = c("a", "b"), 
+                                  new_col_name = "JOINCOL")
+head(dfx_2newcol)
+```
+
+```{r dfy_2newcol}
+dfy_2newcol <- create_join_column(df = DFY, 
+                                  join_cols = c("A", "B"), 
+                                  new_col_name = "JOINCOL")
+head(dfy_2newcol)
+```
+
+```{r join-dfx_2newcol-dfy_2newcol}
+inner_join(x = dfx_2newcol, y = dfy_2newcol)
+```
+
+```{r}
+dfx_3newcol <- create_join_column(df = DFX, join_cols = c("a", "b", "x"), new_col_name = "JOINCOL")
+dfy_3newcol <- create_join_column(df = DFY, join_cols = c("A", "B", "X"), new_col_name = "JOINCOL")
+inner_join(x = dfx_3newcol, y = dfy_3newcol)
+```
+
+## Extracting metadata with `fs`
+
+Now we want to use the `fs` package to create a function that imports data into a shiny app and extracts the metadata. We will start with a basic shinydashboard layout:
+
+```{r metadata-app}
+fs::dir_tree("apps")
+```
+
+Now we'll write a function that akes a full file path and imports the metadata:
+
+```{r}
+getwd()
+fs::dir_tree("/Users/mjfrigaard/Dropbox/@projects/high-priority/@r_training_materials/programming-with-dplyr/writing-dplyr-functions/data/sas")
+```
+
+
+```{r}
+fs::file_info("data/csv/applicants.csv", follow = TRUE)
+fs::file_info("data/sas/hadley.sas7bdat", follow = TRUE)
+```
+
+
+

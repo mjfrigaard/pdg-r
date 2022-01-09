@@ -1,0 +1,770 @@
+---
+title: "Intro to purrr (references)"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    highlight: kate
+    toc_depth: 6
+    df_print: paged
+    
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+## Global options
+library(knitr)
+library(tidyverse)
+library(rmdformats)
+library(listviewer)
+library(repurrrsive)
+library(jsonlite)
+knitr::opts_knit$set(unnamed.chunk.label = "code")
+
+knitr::opts_chunk$set(
+    warning = FALSE,
+    message = FALSE,
+    fig.path = "figs/",
+    fig.width = 7.252,
+    fig.height = 4,
+    comment = "#>",
+    fig.retina = 3 # Better figure resolution
+)
+options(width = 60)
+```
+
+# Outline
+
++ Iteration
+
++ Intro to `purrr` (from [`r4epi`](https://www.r4epi.com/))
+
++ Functionals (from [Advanced R, 2nd Edition](https://adv-r.hadley.nz/functionals.html#purrr-style))  
+
++ `purrr` tutorials by [Jenny Bryan](https://jennybc.github.io/purrr-tutorial/) and [Charlotte Wickham](https://github.com/cwickham/purrr-tutorial)
+
+
+
+# Iteration
+
+Iteration is a problem solving method we can use when we need to repeat a certain action multiple times (usually with varying inputs). 
+
+> *Iteration means repeatedly carrying out a process. To solve an equation using iteration, start with an initial value and substitute this into the iteration formula to obtain a new value, then use the new value for the next substitution, and so on.* [BBC Bitesize article](https://www.bbc.co.uk/bitesize/guides/zp48msg/revision/7#:~:text)
+
+Computers make iteration easier because we can express the processes with code. Iteration is commonly written (and thought of) as for loops (*for each [**`thing`**], do [**`something`**]*), but R takes iteration a step further because of it's use of functions:
+
+> *Instead of coding loops, you exploit R’s functional features, which let you express iterative behavior implicitly. This can lead to code that executes much more efficiently, and it can make a huge timing difference when running R on large data sets.* - [The Art Of R Programming. Copyright 2011 by Norman Matloff](https://nostarch.com/artofr.htm)
+
+
+# (`adv-r`) Functionals 
+
+This section covers the functionals section of from [Advanced R, 2nd Edition](https://adv-r.hadley.nz/functionals.html#map). 
+
+`map()` is the "foundational functional" from `purrr`, and it requires two inputs: `.x`, a vector or list, and `.f` a function (without parentheses).
+
+```{r map-args, eval=FALSE}
+map(.x = , .f = )
+```
+
+Below we apply the function `fudge_fct()` to the vector `nums_input`:
+
+```{r nums_input}
+nums_input <- c(5.4, 3.2, 8.4, 2.2, 5)
+```
+
+```{r fudge_fct}
+fudge_fct <- function(x) as.numeric(x)*1.10
+fudge_fct(nums_input)
+```
+
+If we're using `map()`, we would do it like so:
+
+```{r map-nums_input-fudge_fct}
+map(.x = nums_input, .f = fudge_fct)
+```
+
+We can see the output from `map()` is a list, not a vector. `nums_input` is a double vector: 
+
+```{r typeof-nums_input}
+typeof(nums_input)
+```
+
+`map()` can take a list or atomic vector, but it will always return a list. Below we convert `nums_input` to a character before passing it to `fudge_fct` with `map()`:
+
+```{r map-list-demo}
+map(.x = as.character(nums_input), 
+    .f = fudge_fct)
+```
+
+And we can see we still get the output as a list. However, `purrr` comes with lots of `map()` variants to give us control of the output. For example, we can use `map_dbl()` to return a double vector:
+
+```{r map_dbl}
+map_dbl(.x = nums_input, .f = fudge_fct)
+```
+
+## (`adv-r`) `for` loops
+
+`for` loops require an *output*, a *sequence*, and a *body*. The output gets built first, which is a vector that has the same length as the output of the function we will apply to the input (usually with `length()` or `ncol()`)
+
+`for` loops require an `i` (or any character) to represent each element in the sequence. Here is a great description from [R4DS](https://r4ds.had.co.nz/iteration.html#for-loops):
+
+> *each run of the `for` loop will assign `i` to a different value from `seq_along(x)`. It’s useful to think of `i` as a pronoun, like "it".*
+
+```{r nums_output}
+# define output
+nums_output <- vector("double", length(nums_input))
+# define sequence
+for (i in seq_along(nums_input)) { 
+    # define body
+  nums_output[[i]] <- fudge_fct(nums_input[[i]]) 
+}
+# view output
+nums_output
+```
+
+The downsides of `for` loops is that they require a lot of code (which increases our chances of typos), *and* they produce to additional objects in our environment (we now have a random `i` floating around in our environment).
+
+With `purrr`, we can see the output from the `for` loop is identical to the output from `map_dbl()`
+
+```{r check-map-dbl-for-loop}
+identical(
+    x = nums_output, 
+    y = map_dbl(.x = nums_input, .f = fudge_fct)
+        )
+```
+
+## Anonymous (lambda) functions
+
+[Anonymous (or lambda) functions](https://dcl-prog.stanford.edu/purrr-basics.html#anonymous-functions-1) are handy shortcuts when using `purrr`. Anonymous functions never assigned to a name in our environment (unlike named functions).
+
+Below we'll create a fake dataset with the [`charlatan`](https://docs.ropensci.org/charlatan/articles/charlatan.html#generate-a-dataset) package.
+
+```{r fake_data}
+library(lubridate)
+library(charlatan)
+fake_data <- charlatan::ch_generate('name', 'job', n = 25, locale = "en_US")
+fake_data <- add_column(fake_data, 
+                        # create some numerical vars
+                         rnorm1 = rnorm(n = 25, mean = 100, sd = 10),
+                         rnorm2 = rnorm(n = 25, mean = 5, sd = 50),
+                         pois = rpois(n = 25, lambda = 3),
+                        # create some date vars
+                         binom = rbinom(n = 25, size = 50, prob = 0.5),
+                         start_date = 
+                            as_date(Sys.Date()) - rbinom(25, 100, 0.75),
+                         end_date = 
+                            as_date(Sys.Date()) - rbinom(25, 25, 0.025)) %>%
+                        # add an id variable
+                         rowid_to_column(.data = ., var = "id")
+fake_data
+```
+
+We will also create a named function for rounding all double values (`num_round`).
+
+```{r num_round}
+num_round <- function(x) {
+    round(x = x, digits = 1)
+}
+```
+
+Now, if we want to apply `num_round()` to `fake_data`, we can use `map_df()`.
+
+```{r map_df-num_round}
+rounded_01 <- map_df(
+    .x = select(.data = fake_data, where(is.double)), 
+    .f = num_round
+    ) 
+rounded_01
+```
+
+To convert this into an (anonymous function, we can remove the name and just type the function directly into `map_df()`:
+
+```{r rounded_02}
+rounded_02 <- map_df(
+    .x = select(.data = fake_data, where(is.double)), 
+    .f = function(x) {round(x = x, digits = 1)}
+    ) 
+identical(x = rounded_01, y = rounded_02)
+```
+
+But this is a lot to type...so `purrr` gives us the lambda function as a shortcut. A lambda function is a special `purrr` shortcut (pronounced “twiddle”), and looks like:
+
+`map_*(object, ~function(., args = value))`
+
+Lambda functions are tricky to get the hang of at first, but we can test these by assigning a single element of the object (`fake_dbl`) to `.` 
+
+By doing this, we can see if our function works on a single element in the object (i.e., `fake_dbl[[2]]`), and then test the object just the way we would use it in the lambda function.
+
+```{r test-lambda}
+# create fake_dbl
+fake_dbl <- select(.data = fake_data, where(is.double))
+# assign test '.'
+. <- fake_dbl[[2]]
+# apply function
+round(x = ., digits = 1)
+```
+
+This is working as expected, so we'll try the lambda syntax in `map_df()`:
+
+```{r test-with-lambda}
+# test with lambda
+map_df(fake_dbl, ~round(., digits = 1))
+```
+
+Now we can check to see if `rounded_03` is identical to `rounded_01`:
+
+```{r rounded_03}
+rounded_03 <- fake_dbl %>% 
+    map_df(~round(., digits = 1))
+identical(x = rounded_01, y = rounded_03)
+```
+
+As we can see, all three of these methods work, so we should prefer the one with the least amount of typing (and neurons).
+
+## Avoid unexpected results 
+
+Another benefit to using `purrr` is that we don't get unexpected results from their outputs. What if we had a bug in our `fudge_fct()` function, and it returned the results as a character vector instead of a double? 
+
+Recall how the original `fudge_fct()` worked:
+
+```{r refresh-fudge_fct}
+fudge_fct(x = nums_input)
+```
+
+Below we demonstrate this example with `fudge_fct_error()`, a new function that does the same thing as the original `fudge_fct()` function, but it converts the output from to a double to an character.
+
+```{r fudge_fct_error}
+fudge_fct_error <- function(x) {
+    z <- as.double(x)*1.10
+    # convert to character
+    x <- as.character(z)
+    return(x)
+}
+```
+
+Now we'll redefine the output `nums_output`, and repeat the for loop with `fudge_fct_error()`:
+
+```{r for-loop-fudge_fct_error}
+# re-define output
+nums_output <- vector("double", length(nums_input))
+# define sequence
+for (i in seq_along(nums_input)) { 
+    # define body
+  nums_output[[i]] <- fudge_fct_error(nums_input[[i]]) 
+}
+```
+
+This returns a character vector (despite the original output vector being a double). 
+
+```{r check-nums_output-str}
+str(nums_output)
+```
+
+
+However, if we try to use a `map()` function that doesn't match the type of the original input, we get an error:
+
+```{r map_int, error=TRUE}
+# confirm the type
+typeof(nums_input)
+map_int(.x = nums_input, .f = fudge_fct_error)
+```
+
+Lambda functions are great for simple functions, but more complex functions should be named:
+
+> *Reserve this syntax for short and simple functions. A good rule of thumb is that if your function spans lines or uses `{}`, it’s time to give it a name. - [Advanced R, 2nd Edition](https://adv-r.hadley.nz/functionals.html#purrr-shortcuts)*
+
+Note that we can switch back to `map_chr()` and `fudge_fct_error()` will work again because it's the correct type of output:
+
+```{r map_chr-fudge_fct_error}
+map_chr(.x = nums_input, .f = fudge_fct_error)
+```
+
+
+
+# (`tutorials`) purrr tutorials
+
+This section covers the `purrr` tutorials by [Jenny Bryan](https://jennybc.github.io/purrr-tutorial/) and [Charlotte Wickham](https://github.com/cwickham/purrr-tutorial). 
+
+## A very typical workflow (`list` -> `data.frame`)
+
+> "a very typical workflow: take an unwieldy nested list and, via extraction and/or simplification, produce a more approachable data frame." - `purrr` tutorial by [Jenny Bryan](https://jennybc.github.io/purrr-tutorial/)
+
+To demonstrate this workflow, we'll use the `got_chars_json` example from the [`repurrrsive` package by Jenny Bryan](https://github.com/jennybc/repurrrsive). It's usually easier to view lists with a JSON viewer (like [`listviewer`](https://github.com/timelyportfolio/listviewer)):
+
+```{r got_characters_as_json}
+got_chars_list <- repurrrsive::got_chars
+# listviewer::jsonedit(got_chars_list)
+names(got_chars_list[[1]])
+```
+
+Assume we want to get the names and aliases for each character in `got_chars_list`. If we did this element-by-element, it would take forever:
+
+```{r names-and-aliases}
+got_chars_list[[1]]$name
+got_chars_list[[1]]$aliases
+got_chars_list[[2]]$name
+got_chars_list[[2]]$aliases
+```
+
+We could use `map_chr()` to extract the `name` from `got_chars_list`:
+
+```{r got_names}
+got_names <- map_chr(.x = got_chars_list, "name")
+head(got_names, 3)
+```
+
+And we could use `map()` to extract the `aliases` from `got_chars_list`:
+
+```{r got_aliases}
+got_aliases <- map(.x = got_chars_list, "aliases")
+head(got_aliases, 3)
+```
+
+If we check the `length()` of both of these objects, we see they are equal:
+
+```{r identical-got_names-got_aliases}
+identical(x = length(x = got_names),
+          y = length(x = got_aliases))
+```
+
+Now we can use `purrr::set_names()` to combine `name` with `aliases` in the same object:
+
+```{r got_names_aliases}
+got_names_aliases <- set_names(x = got_aliases, 
+                               nm = got_names)
+head(got_names_aliases, 3)
+```
+
+Now that we have the names and aliases, we just need a function for combining them into a single line (`comma_smush()`)
+
+```{r comma_smush}
+comma_smush <- function(x) paste(x, collapse = ", ")
+head(map(got_names_aliases, comma_smush), 3)
+```
+
+We can re-write this as a lambda function like so: 
+
+```{r lambda-comma_smush}
+head(
+    map(.x = got_names_aliases, ~ paste(.x, collapse = ", ")), 
+    3)
+```
+
+Ok, so now that we know what variables we want in our data.frame (`name` and `aliases`), we can switch from `map()` to `map_chr()`, and use `tibble::enframe()` to convert the output to a rectangle (`GotNamesAliases`):
+
+```{r GotNamesAliases}
+GotNamesAliases <- map_chr(.x = got_names_aliases, 
+                           ~ paste(.x, collapse = ", ")) %>% 
+                        tibble::enframe(value = "aliases")
+head(GotNamesAliases, 3)
+```
+
+We can also feed these functions *directly* into the `tibble()` function as variables: 
+
+```{r GotNmAliasTle}
+GotNmAliasTle <- tibble::tibble(
+    # we can convert this directly into a character 
+    # vector (recall it has a length() of 30!)
+  name = map_chr(got_chars_list, "name"),
+  # but these need two layers:
+  aliases = got_chars_list %>% 
+      # map "aliases" into the list
+    map(.x = ., .f = "aliases") %>% 
+      # then use our function for combining the output
+    map_chr(~ paste(.x, collapse = ", ")),
+  titles = got_chars_list %>% 
+      # we could do this with 'titles' too
+      map(.x = ., .f = "titles") %>% 
+      # we will separate these by a semicolon 
+      # instead of a comma
+  map_chr(~ paste(.x, collapse = "; ")))
+GotNmAliasTle
+```
+
+We can also extend this workflow to `map2()` and `pmap()`
+
+## (`list` -> `data.frame`) `map2()`
+
+We use `map2()` when we have two objects and we want to iterate a function over them. We already have a vector of GOT names (`got_names`), so we will extract the place and year they were born. 
+
+```{r got_births}
+got_births <- got_chars %>% map_chr("born")
+```
+
+Below is a function (`born_fun()`) which takes the contents of `x` and combines it with `y` (with `"was born"` in-between).
+
+```{r born_fun}
+born_fun <- function(x, y) paste(x, "was born", y)
+```
+
+```{r map2_chr-was_born_smash}
+head(map2_chr(got_names, got_births, born_fun), 3)
+# or with a lambda function
+head(map2_chr(got_names, got_births, ~ paste(.x, "was born", .y)), 3)
+```
+
+The code above might be a case for using the lambda function just to avoid cluttering up our working environment, but both methods produce the same results.
+
+## (`list` -> `data.frame`) `pmap()`
+
+We used `map_*()` when we have a single object we want to iterate a function over, `map2_*()` when there are two objects we want to iterate a function over, and `pmap_*()` is (you guessed it) used when we have more than two objects we want to iterate over (i.e., *two or more vectors or lists in parallel*). 
+
+We want to create a `tibble` of list-cols (variables containing lists), which we can do with `tibble()` and `map()`. 
+
+If we pipe the `got_chars_list` directly over to the tibble() function and use map() to create list columns from `name`, `aliases`, `allegiances`, and `culture`, we notice we get 
+
+```{r my_list}
+my_list <- list(
+    list(1, 
+         x = 1.5, 
+         y = c(2), 
+         z = "A"),
+    list(2, 
+         x = 4.2, 
+         y = c(5, 6), 
+         z = "B"),
+    list(3, 
+         x = 8.8, 
+         y = c(9, 10, 11))
+)
+my_list %>% 
+    tibble(x = map(., "x"),
+           y = map(., "y"),
+           z = map(., "z"))
+my_list %>% {
+    tibble(x = map(., "x"),
+           y = map(., "y"),
+           z = map(., "z"))}
+```
+
+
+```{r}
+got_chars_list %>% 
+tibble::tibble(
+    name = map_chr(., "name"),
+    aliases = map(., "aliases"),
+    allegiances = map(., "allegiances"),
+    culture = map(., "culture")
+    ) %>% glimpse()
+```
+
+Notice the `.` variable in this tibble? We can remove this by wrapping the `tibble()` call in curly brackets `{}`:
+
+```{r}
+got_chars_list %>% {
+  tibble::tibble(
+    name = map_chr(., "name"),
+    aliases = map(., "aliases"),
+    allegiances = map(., "allegiances"),
+    culture = map(.x = ., "culture")
+  )
+}
+```
+
+
+# (`r4epi`) Intro to `purrr` 
+
+These materials come from [r4epi](https://www.r4epi.com/using-the-purrr-package.html#using-purrr-for-analysis). Instead of the toy data from this section, I am going to use the NHANES dataset from the `NHANES` package. 
+
+```{r nhanes}
+library(NHANES)
+nhanes <- NHANES::NHANES %>% janitor::clean_names()
+epi_data <- nhanes %>% 
+    slice_sample(n = 25, replace = FALSE) %>% 
+    select(id, survey_yr, gender, age, 
+        age_decade, weight, height, bmi, pulse,
+        bp_sys_ave, bp_dia_ave, tot_chol, 
+        race3, hh_income, poverty, home_own, work)
+epi_data
+```
+
+
+## (`r4epi`) Column-wise operations
+
+Below we use `dplyr`'s `summarise()` function with [`across()`](https://dplyr.tidyverse.org/reference/across.html), and use the `{.col}` to convert the column names. 
+
+I've changed this code a bit to get the median instead of the mean. 
+
+```{r colwise-operations}
+epi_data %>% 
+  select(where(is.numeric)) %>% 
+  summarise(
+    across(
+      .cols  = everything(),
+      .fns = median,
+      na.rm = TRUE,
+      .names = "{.col}_median"
+    )
+  )
+```
+
+Recall that we can also pass multiple columns to `across()` in a `list` (to `.fn` argument) and we can build the names with both `{.col}` and `{.fn}`:
+
+```{r epi_data-fns-cols}
+epi_data %>% 
+  select(where(is.numeric)) %>% 
+  summarise(
+    across(
+      .cols  = everything(),
+      .fns   = list(median = median, mean = mean),
+      na.rm  = TRUE,
+      .names = "{.col}_{.fn}"
+    )
+  )
+```
+
+## (`r4epi`) The `for` loop approach
+
+Below we define the output for `epi_dbl`.
+
+```{r epi_dbl}
+epi_dbl <- epi_data %>% 
+    select(id, where(is.double))
+epi_dbl
+```
+
+```{r epi_medians_loop}
+epi_medians_loop <- vector("double", ncol(epi_dbl))
+epi_medians_loop
+```
+
+After we've created the output, we write the `sequence` and the `body`, which assigns the median of each element in `median(epi_dbl[[i]])` to each position in `epi_medians_loop[[i]]`.
+
+```{r for-loop-epi_medians_loop}
+for (i in seq_along(epi_dbl)) { # sequence
+  epi_medians_loop[[i]] <- median(epi_dbl[[i]], na.rm = TRUE) # body
+}
+# set names 
+epi_medians_loop <- set_names(x = epi_medians_loop, 
+                              names(epi_dbl))
+epi_medians_loop
+```
+
+
+
+## (`r4epi`) The `purrr` approach
+
+Using `purrr`, we can supply `epi_dbl` to the `.x` argument in `map_dbl()`, and the median function to `.f` (and the additional arguemnts for median get passed to `map_dbl()`)
+
+```{r epi_medians_map}
+epi_medians_map <- map_dbl(
+  .x = epi_dbl, 
+  .f = median, 
+  na.rm = TRUE
+)  
+epi_medians_map
+```
+
+We end up with an identical object as `epi_medians_loop`
+
+```{r identical}
+identical(x = epi_medians_map, 
+          y = epi_medians_loop)
+```
+
+As another example, we build a character vector of names: 
+
+```{r sw_names}
+sw_names <- c("Jar Jar Binks", "Darth Vader", "Chewbacca")
+sw_names
+```
+
+Assume we *we want to extract the number of letters in each name contained in `sw_names`*
+
+If we want to run a `for` loop that counts the number of letters, we know we want our output to be another double vector.  
+
+```{r n_letters}
+n_letters <- vector("double", length(sw_names)) # Expecting double
+str(n_letters)
+```
+
+Now assume the function we use to extract the number of letters is `str_extract()` (which is not the correct function for this)
+
+```{r for-loop-n_letters}
+for (i in seq_along(sw_names)) {
+    # returns char
+  n_letters[[i]] <- str_extract(string = sw_names[[i]], pattern = "\\w") 
+}
+str(n_letters)
+```
+
+We can see this isn't doing what we want, and it's returning the first letter in each name as a character vector (despite `n_letters` being created as a double vector). 
+
+If we repeat this process with `purrr`'s `map_dbl()`, we get an error: 
+
+```{r map_dbl-sw_names, error=TRUE}
+n_letters <- vector("double", length(sw_names)) # new double vector 
+map_dbl(
+    .x = sw_names, 
+    .f = stringr::str_extract, "\\w{1}"
+)
+```
+
+This is nice because we don't end up with unexpected results. 
+
+## (`r4epi`)[`walk()` for data importing](https://www.r4epi.com/using-the-purrr-package.html#using-purrr-for-data-transfer)
+
+This requires us to download the data from [this link](https://www.dropbox.com/s/6nt00hmdzfdigp3/city_ses.xlsx?dl=1). I've stored them in a local `data/` folder. 
+
+```{r data-folder, echo=FALSE}
+fs::dir_tree("data")
+```
+
+One way to import these sheets is to run a separate import function for each sheet. 
+
+```{r read_excel}
+library(readxl)
+xlsx_file_path <- "data/city-data/city_ses.xlsx"
+readxl::read_excel(path = xlsx_file_path, sheet = "Houston")
+readxl::read_excel(path = xlsx_file_path, sheet = "Atlanta")
+readxl::read_excel(path = xlsx_file_path, sheet = "Charlotte")
+```
+
+But this is a lot of duplicated code, but we have some options with `purrr`: 
+
+**1. Import with `map()` (as a `list`)**
+
+In this case, we end up with all the data in a list, but we'd have to separate these into separate `data.frame`s.
+
+```{r df_list}
+df_list <- map(
+  .x = excel_sheets(xlsx_file_path),
+  .f = ~ read_excel(xlsx_file_path, sheet = .x)
+)
+xlsx_sheet_names <- excel_sheets(xlsx_file_path)
+df_list <- set_names(x = df_list, 
+                     nm = xlsx_sheet_names)
+Houston <- df_list$Houston
+Atlanta <- df_list$Atlanta
+Charlotte <- df_list$Charlotte
+```
+
+**2. Import with `map_dfr()` (as a `data.frame`)**
+
+We can also import these into a single `data.frame` using the `map_dfr()` function, which will row-bind the data (and we can keep track with an identifier variable `"source"`).
+
+```{r all_cities}
+all_cities <- map_dfr(
+  .x = excel_sheets(path = xlsx_file_path),
+  .f = ~ read_excel(path = xlsx_file_path, sheet = .x),
+  .id = "source"
+)
+all_cities
+```
+
+We can now separate these into individual `data.frame`s, but once again, we'd have two additional objects (and a lot more code to write).
+
+**3. Import with `walk()` (as separate named `data.frame`s)**
+
+Ideally, we'd be able to reduce this to a path (`xlsx_file_path`) and an anonymous function (`read_excel()`). However, we want each of the datasets in the excel file into our current environment (and not create too many new objects in the process).
+
+This is where we'd use  [`walk()`](https://purrr.tidyverse.org/reference/map.html). What do we know about `walk()`? 
+
+1. *`walk()` calls `.f` for its side-effect and returns the input `.x`*  
+2. *`walk()` returns the input `.x` (invisibly). This makes it easy to use in pipe.*  
+
+We can demonstrate when these two aspects might come in handy with this adapted example from [Advanced R, 2nd Edition](https://adv-r.hadley.nz/functionals.html#no-outputs-walk-and-friends): 
+
+```{r welcome-function}
+welcome <- function(x) {
+    cat("Welcome ", x, "!\n", sep = "")
+    }
+walk(.x = sw_names, .f = welcome)
+```
+
+> *the only thing `walk()` “returns” is exactly what was passed to its `.x` argument. No matter what you pass to the `.f` argument, the object passed to `.x` will be returned by `walk()` unmodified.*
+
+In our case, `.x` is `excel_sheets(xlsx_file_path)`:
+
+```{r sheets-xlsx_file_path}
+excel_sheets(xlsx_file_path)
+```
+
+And `.f` is an anonymous function the will combine `str_to_lower()`, `read_excel()` and a new function, `assign()`.
+
++ `assign()` = *Assign a value to a name in an environment.*  
+    + We use the `envir` argument to assign the output to the *Global environment*:  
+    
+```{r check-global}
+identical(globalenv(), .GlobalEnv)
+```
+
+All together within the `walk()` functions, the various inputs look like this:
+
+```{r walk-read_excel-assign}
+# remove previous so we're not fooling ourselves
+rm(Charlotte, Atlanta, Houston)
+walk(
+  .x = excel_sheets(xlsx_file_path),
+  .f = function(x) {
+    new_nm <- paste0(str_to_lower(x), "_data") # lowercase the names 
+    assign(x = new_nm, # assign these to the new names
+           value = read_excel(xlsx_file_path, sheet = x), # the values are 
+           # the file we're reading from 'xlsx_file_path'
+           envir = .GlobalEnv) # and we're importing them into our 
+           # global environment
+  }
+)
+```
+
+Check the environment:
+
+```{r check-ls-data}
+ls(pattern = "_data")
+```
+
+## Another example (`walk2()`)
+
+Consider another example: below we have a list of books and their URLS from [Project Gutenberg](https://www.gutenberg.org/).
+
+```{r melville_books}
+melville_books <- list("Bartleby-the-Scrivener" = "https://www.gutenberg.org/cache/epub/11231/pg11231.txt",
+     "Moby-Dick" = "https://www.gutenberg.org/files/2701/2701-0.txt", 
+     "The-Confidence-Man" = "https://www.gutenberg.org/cache/epub/21816/pg21816.txt")
+melville_books
+```
+
+We want to download these three files (using their URLS). but in order to do this, we don't need `purrr` to return an object with the files--we want them downloaded into a particular location. For this circumstance, we'll use a variant of `walk()` that takes two arguments (`walk2()`)
+
+> *One of the most useful `walk()` variants is `walk2()` because a very common side-effect is saving something to disk, and when saving something to disk you always have a pair of values: the object and the path that you want to save it to.*
+
+First we build the folder structure we want the files to end up in:
+
+```{r create-downloads}
+fs::dir_create("downloads/")
+map(.x = paste0("downloads/", str_to_lower(names(melville_books)), "/"), fs::dir_create)
+```
+
+We can verify this below:
+
+```{r verify-downloads}
+fs::dir_tree("downloads/")
+```
+
+Now we create the file paths. 
+
+```{r book_file_paths}
+book_file_paths <- paste0("downloads/", 
+                          str_to_lower(names(melville_books)), "/", ... =
+                          str_to_lower(names(melville_books)), ".txt")
+book_file_paths
+```
+
+With these two items, we can use `walk2()` to download the files into their respective locations:
+
+```{r walk2}
+walk2(.x = set_names(melville_books), # urls
+      .y = book_file_paths, # location
+      .f = download.file) # function
+```
+
+Verify the downloads:
+
+```{r verify-downloads-again}
+fs::dir_tree("downloads/")
+```
+
+```{r clear-workspace, echo=FALSE, results='hide'}
+# clean these up so they run in order! 
+map(.x = book_file_paths, .f = unlink)
+```
+

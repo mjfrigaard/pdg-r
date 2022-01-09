@@ -1,0 +1,52 @@
+---
+title: "R Markdown training (outline)"
+author: "Martin Frigaard"
+date: "1/9/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+Our R Markdown training covers the basics of Markdown and `knitr`, table outputs (`knitr` and `gt_summary`), graphics (`ggplot2` and `plotly`), importing and caching data, and rendering M Markdown files into various outputs.
+
+# Outline
+
++ R Markdown Anatomy
+
+  - Why use R Markdown?
+
+  - Metadata (YAML)
+
+  - Text (human readable)
+
+  - Code (machine readable)
+
++ Outputs & Tables
+
+  - Standard output (`tibble`)  
+  
+  - Interactive tables (`paged`)  
+  
+  - Table packages (`reactive` + `gt_summary`)
+
++ Graphs
+
+  - Standard graph outputs  
+  
+  - Customizing graph size & format (`dpi`, `fig.height`, `fig.width`, `fig.cap`) 
+  
+  - Saving graphs (`.png`, `.jpg`, and `.pdf`)
+  
+  - Interactive graphs (`plotly`)
+
++ Data & Workflows
+
+  - Loading data (`setup` and `global` code chunks)  
+  
+  - Caching data (`cache` and dependent code chunks)  
+  
+  - loading data with parameterized reports 

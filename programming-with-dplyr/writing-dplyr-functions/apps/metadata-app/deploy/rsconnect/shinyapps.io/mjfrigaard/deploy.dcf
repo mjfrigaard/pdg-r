@@ -1,0 +1,13 @@
+name: deploy
+title: deploy
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5324811
+bundleId: 5371350
+url: https://mjfrigaard.shinyapps.io/deploy/
+when: 1639489904.97875
+lastSyncTime: 1639489904.97876
+asMultiple: FALSE
+asStatic: FALSE
