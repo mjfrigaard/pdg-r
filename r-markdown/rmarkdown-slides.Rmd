@@ -25,10 +25,10 @@ meta() %>%
     description = "Introduction to R Markdown",
     generator = "xaringan and remark.js"
   ) %>%
-  meta_name("github-repo" = "mjfrigaard/csuc-data-journalism") %>%
+  meta_name("github-repo" = "mjfrigaard/pdg-r/") %>%
   meta_social(
     title = "Introduction to R Markdown",
-    url = "https://mjfrigaard.github.io/csuc-data-journalism/",
+    url = "https://github.com/mjfrigaard/pdg-r/r-markdown/",
     og_type = "website",
     og_author = "Martin Frigaard",
     twitter_card_type = "summary",
@@ -112,12 +112,10 @@ background-size: 7%
 
 ### Link to slides: 
 
-https://mjfrigaard.github.io/csuc-data-journalism/slides.html
-
 
 ### Link to exercises: 
 
-https://mjfrigaard.github.io/csuc-data-journalism/lessons-exercises.html
+
 
 ---
 class: inverse, center
