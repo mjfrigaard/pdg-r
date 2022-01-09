@@ -1,0 +1,44 @@
+---
+title: "Intro to iteration (for loops and purrr)"
+author: "Martin Frigaard"
+date: "1/9/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview 
+
+Iteration solves many common problems we encounter in data workflows. This tutorial covers the basics of iteration in R, starting with using `for` loops, their structure, designing your loops for optimal performance, and debugging errors. We also cover the tidyverse package for iteration, `purrr`, which uses functionals (a `tidyverse` equivalent to `for` loops). 
+
+## Use cases for iteration 
+
+- Problems that iteration solves
+
+- DRY principle
+
+## `for` loops
+
+  - `for` loop structure (output, sequence, body)
+
+  - output
+
+  - sequence
+
+  - body
+
+## `purrr` functions
+
+- `map()` (and variants)
+
+- `walk()` & `walk2()`
+
+- `pmap()`, `imap()`, etc.
+
+## Worked examples 
+
+- Export/import multiple datasets
+
+- Downloading files from the web
