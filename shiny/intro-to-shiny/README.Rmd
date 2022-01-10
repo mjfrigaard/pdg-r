@@ -1,0 +1,92 @@
+---
+title: "Intro to Shiny"
+author: "Martin Frigaard"
+date: '`r Sys.Date()`'
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview 
+
+## Shiny app anatomy  
+
+<br>
+
++ `ui`
++ `server`
++ `app.R`
+
+## User Interface (UI)  
+
+<br>
+
++ layouts  
+  - `fluidPage()`  
+  - `shinydashboard`  
+  
++ input options  
+  - `sliderInput()`  
+  - `selectInput()`  
+  - `checkboxInput()`  
+  - `textInput()`  
+  - `textAreaInput()`  
+
+## Server  
+
+<br>
+
++ building `reactive()`s   
++ linking inputs and outputs   
+  - `render_*()` functions
+
+## `flexdashboard`  
+
+<br>
+
++ Recap `rmarkdown`  
+
++ What belongs in a dashboard?
+
+## Layouts  
+
+<br>
+
+- Sidebars 
+
+- Columns    
+
+- Rows
+
+- Pages  
+
+- Tabs
+
+## `shiny` + `flexdashboard`  
+
+<br>
+
+- Converting from `flexdashboard` to `shiny` app`
+
+- Combining shiny reactivity with `flexdashboard`
+
+## Packages   
+  
+<br>
+
++ `inspectdf` package 
+
+  - graphs, syntax   
+
++ `reactable` package 
+
+  - table displays
+  
+## Themes   
+  
+<br>
+
+- Bootstrap themes   
+

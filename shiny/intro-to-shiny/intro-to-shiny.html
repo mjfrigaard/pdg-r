@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction to Shiny Apps</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Martin Frigaard" />
+    <meta name="date" content="2022-01-09" />
+    <script src="intro-to-shiny_files/header-attrs-2.11/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to Shiny Apps
+## bmRn CSM: Building applications with R
+### Martin Frigaard
+### 2022-01-09
+
+---
+
+
+
+
+
+
+class: inverse, center, top
+background-image: url(img/shiny.png)
+background-position: 50% 70%
+background-size: 35%
+
+# `Shiny` = Web Applications with R
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Load the packages
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+
+
+```r
+install.packages(c("tidyverse", "inspectdf",
+                   "shiny", "flexdashboard",
+                   "reactable", "gtrendsR"))
+library(tidyverse)
+library(shiny)
+library(inspectdf)
+library(flexdashboard)
+library(reactable)
+library(gtrendsR)
+```
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Materials
+
+## Slides
+
+https://mjfrigaard.github.io/intro-to-shiny/Index.html
+
+## Exercises
+
+*coming soon!*
+
+## RStudio Project
+
+https://rstudio.cloud/project/2021718
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+## Outline
+
+.pull-left[
+
+### Shiny app anatomy
+
+- ui  
+- server  
+- run
+
+### User Interface (UI)
+
+- build layout (`fluidPage()`)
+
+- define `input`s
+
+]
+
+.pull-right[
+
+### Server
+
+- build `reactive()`
+
+- use `input`s with `output`
+
+### `flexdashboard`
+
+- Uses R Markdown
+
+- Convert from static to shiny app
+
+]
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+# Create a new app
+
+&lt;img src="img/new-app.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+# Run app
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+
+.pull-left[
+
+&lt;img src="img/view-in-viewer.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="img/run-app.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+# Stop running app
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/click-to-stop.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, top
+background-image: url(img/shiny.png)
+background-position: 50% 70%
+background-size: 35%
+
+# Anatomy of a shiny app
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+## Shiny app internals
+
+### User interface (UI)
+
+
+```r
+ui &lt;- fluidPage()
+```
+
+--
+
+### Server
+
+
+```r
+ui &lt;- fluidPage()
+server &lt;- function(input, output) {}
+```
+
+--
+
+### Run
+
+
+```r
+ui &lt;- fluidPage()
+server &lt;- function(input, output) {}
+shinyApp(ui = ui, server = server)
+```
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+# Example shiny app
+
+&lt;br&gt;
+
+### Open the app.R in `google-trends/`
+
+
+```r
+google-trends/
+            └── app
+                ├── app.R # application
+                └── data
+                    └── 2020-12-13-BmrnGoogleIOT.csv # data
+```
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 9%
+
+# `google-trends/` data input
+
+### Locate the .csv file in `google-trends/app/data`
+
+&lt;br&gt;
+
+&lt;img src="img/import-data-1.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 8%
+
+# `google-trends/` data input
+
+### Import the .csv file in 
+
+&lt;img src="img/import-data-2.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 8%
+
+# `google-trends/` data input
+
+### View the imported .csv file 
+
+&lt;img src="img/import-data-3.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, top
+background-image: url(img/shiny.png)
+background-position: 50% 70%
+background-size: 35%
+
+# The User Interface (ui)
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+# UI: `fluidPage()`
+
+
+&lt;img src="img/sidebar.png" width="60%" height="60%" style="display: block; margin: auto;" /&gt;
+.pull-right[Image by Hadley Wickham]
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 8%
+
+# fluidPage: `sidebarLayout()`
+
+This consists of a `sidebarPanel()` and `mainPanel()`
+
+
+```r
+ui &lt;- fluidPage(
+            titlePanel(title = "BioMarin Google Trends"),
+*               sidebarLayout(
+                    sidebarPanel(
+                    
+                    ),
+                    mainPanel(
+                    
+                    )
+                  )
+                )
+```
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 9%
+
+# fluidPage: `sidebarPanel()`
+
+The `selectInput()` and `dateRangeInput()` are in the `sidebarLayout()`
+
+
+```r
+sidebarLayout(
+*   sidebarPanel(
+      # Select trend term to plot
+      selectInput(inputId = "key",
+                  label = strong("Trend Term"),
+                  choices = unique(BmrnGoogleIOT$keyword),
+                  selected = "BioMarin"),
+
+      # Select date range to be plotted
+      dateRangeInput(inputId = "date", strong("Date range"),
+                     start = "2019-12-15", end = "2020-12-06",
+                     min = "2019-12-15", max = "2020-12-06"),
+*   ), # note the comma!
+```
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 8%
+
+# fluidPage: `sidebarPanel()`
+
+This consists of a `sidebarPanel()` and `mainPanel()`
+
+&lt;br&gt;
+
+&lt;img src="img/sidebarPanel-out.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 9%
+
+# fluidPage: `mainPanel()`
+
+The `plotOutput()` and text (`tags`) output will going into the `mainPanel()`
+
+
+```r
+    sidebarLayout(
+*), # note the comma!
+      mainPanel(
+        plotOutput(outputId = "lineplot",
+                   height = "300px"),
+        tags$a(href = "https://www.google.com/",
+               "Source: Google Trends",
+               target = "_blank"))
+      )
+*   )
+```
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 9%
+
+# fluidPage: `mainPanel()`
+
+The `plotOutput()` and text (`tags`) output will going into the `mainPanel()`
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/mainPanel-out.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 9%
+
+# UI layout
+
+&lt;br&gt;
+
+&lt;img src="img/ui-layout.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, top
+background-image: url(img/shiny.png)
+background-position: 50% 70%
+background-size: 35%
+
+# The Server
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 8%
+
+## `server`
+
+### The `server` is comprised of the `input` &amp; `output`
+
+&lt;br&gt;
+
+
+```r
+function(input, output) {
+  # data input
+  # plot output
+}
+```
+
+### Elements from the `ui` (`inputId`, `outputId`) get passed to the `server`
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 7%
+
+# Build `reactive` dataset (1)
+
+Require `date` variable `input` from from `dateRangeInput()`:
+
+
+```r
+selected_trends &lt;- reactive({
+*   req(input$date)
+```
+
+--
+
+Print errors if `date`s from `dateRangeInput()` are selected incorrectly
+
+
+```r
+selected_trends &lt;- reactive({
+    req(input$date)
+    validate(need(!is.na(input$date[1]) &amp; !is.na(input$date[2]),
+*       "Error: Please provide both a start and an end date."))
+    validate(need(input$date[1] &lt; input$date[2],
+*        "Error: Start date should be earlier than end date."))
+```
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 7%
+
+# Build `reactive` dataset (2)
+
+Filter these data by the `key` from the `selectInput()` and the `date` from `dateRangeInput()`
+
+
+```r
+function(input, output) {
+  selected_trends &lt;- reactive({
+    #....
+    #....
+*   BmrnGoogleIOT %&gt;%
+*     filter(keyword == input$key,
+*       date &gt; as.POSIXct(input$date[1]) &amp;
+*         date &lt; as.POSIXct(input$date[2]))
+  })
+}
+```
+
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 7%
+
+## Build `reactive` dataset (3)
+
+### 1) Use `reactive({})` to build data
+
+
+```r
+  selected_trends &lt;- reactive({
+      # inputs from ui are passed are used to filer .csv file
+  })
+```
+
+--
+
+### 2) Call `selected_trends()` in `server`
+
+Now whenever we need to use the dataset, we can refer to it using **`selected_trends()`**
+
+
+```r
+selected_trends() %&gt;% 
+  ggplot(aes(x = date, y = hits))
+```
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 7%
+
+## Build plot with `renderPlot({})` (1)
+
+&lt;br&gt;
+
+- Use `output$lineplot`...
+
+  - which matches `plotOutput(outputId = "lineplot")`
+  
+--
+
+&lt;br&gt;
+
+
+```r
+* output$lineplot &lt;- renderPlot({
+```
+
+--
+
+&lt;br&gt;
+
+Each `outputId` in the `ui` can be used in the `server` with `output`.
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 8% 95%
+background-size: 7%
+
+## Build plot with `renderPlot({})` (2)
+
+&lt;br&gt;
+
+Use **`selected_trends()`** (the reactive dataset) to build the `ggplot2` object:
+
+
+```r
+*   selected_trends() %&gt;%
+      ggplot(aes(x = date, y = hits, 
+                 color = Location, group = keyword)) +
+      geom_line(aes(group = Location),
+                show.legend = FALSE) +
+      facet_wrap(. ~ Location, nrow = 2) +
+      theme_minimal() +
+      labs(x = "Date", y = "Hits")
+  })
+```
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 9%
+
+# Server layout
+
+&lt;br&gt;
+
+&lt;img src="img/server-layout.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 7%
+
+## Run the app!
+
+
+```r
+shinyApp(ui = ui, server = server)
+```
+
+&lt;img src="img/full-shiny.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: inverse, center, top
+background-image: url(img/shiny.png)
+background-position: 50% 70%
+background-size: 35%
+
+# `flexdashboard` and `shiny`
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 7%
+
+## Create new `flexdashboard` file
+
+### File &gt; New File &gt; R Markdown
+
+&lt;img src="img/new-rmd.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Add `runtime: shiny` to `YAML`
+
+&lt;br&gt;
+
+&lt;img src="img/runtime-shiny.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Add `setup` chunk
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/setup-flex-chunk.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Define `input`s
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/define-inputs.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Define `reactive`
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/define-reactive.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Build plot with `renderPlot()`
+
+&lt;br&gt;
+
+&lt;img src="img/flex-renderPlot.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Save and `Run Document`
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/save-and-run.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 10%
+
+## Our app as a `flexdashboard`!!
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/full-dash.png" width="100%" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/shiny.png)
+background-position: 95% 8%
+background-size: 12%
+
+# More Resources:
+
+&lt;br&gt;&lt;br&gt;
+
+### [Shiny](https://shiny.rstudio.com/): RStudio resources
+
+### [Mastering Shiny](https://mastering-shiny.org): A text from Hadley Wickham
+
+### [Engineering Production-Grade Shiny Apps](https://engineering-shiny.org/): A text from ThinkR
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

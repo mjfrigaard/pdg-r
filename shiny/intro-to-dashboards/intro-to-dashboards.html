@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction to Dashboards</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Martin Frigaard" />
+    <meta name="date" content="2022-01-09" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <meta name="description" content="Introduction to Dashboards"/>
+    <meta name="generator" content="xaringan and remark.js"/>
+    <meta name="github-repo" content="mjfrigaard/pdg-r/shiny/intro-to-dashboards/"/>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/shareon/shareon.min.css" rel="stylesheet" />
+    <script src="libs/shareon/shareon.min.js"></script>
+    <link href="libs/xaringanExtra-shareagain/shareagain.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-shareagain/shareagain.js"></script>
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/lexis.css" type="text/css" />
+    <link rel="stylesheet" href="css/lexis-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+layout: true
+
+&lt;!-- this adds the link footer to all slides, depends on footer-small class in css--&gt;
+
+&lt;!-- &lt;div class="footer-small"&gt;&lt;span&gt;https://github.com/mjfrigaard/pdg-r/&lt;/span&gt;&lt;/div&gt; --&gt;
+
+---
+name: title-slide
+class: title-slide, center, middle, inverse
+
+# Introduction to Dashboards
+#.fancy[building dashboards with flexdashboard]
+
+&lt;br&gt;
+
+.large[by &lt;author&gt;]
+
+Written: January 09 2022
+
+Updated: January 09 2022
+
+---
+class: inverse, center, top
+background-image: url(img/flexdashboard.png)
+background-position: 50% 70%
+background-size: 25%
+
+# `flexdashboard` = Dashboards using R Markdown (and Shiny)
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Load the packages 
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
+
+
+```r
+install.packages(c("tidyverse", "inspectdf", 
+                   "flexdashboard", "reactable"))
+library(tidyverse)
+library(inspectdf)
+library(flexdashboard)
+library(reactable)
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Outline (1)
+
+
+.leftcol[
+
+###  Recap `rmarkdown`
+
+### What belongs in a dashboard?
+
+### Layouts
+
+  - *Sidebars, Columns, and Rows*  
+  - *Multiple Pages, Tabs*
+
+### Themes 
+
+  - *Bootstrap themes* 
+  
+]
+
+.rightcol[
+
+
+### Packages 
+
++ `inspectdf` package 
+
+  - *graphs, syntax* 
+
++ `reactable` package 
+
+  - *table displays*
+
+### Examples with `shiny`
+
+  - *shiny reactivity*
+
+] 
+ 
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Materials
+
+## Slides 
+
+## Exercises 
+
+## RStudio Project
+
+
+---
+class: inverse, center, top
+background-image: url(img/rmarkdown.png)
+background-position: 50% 70%
+background-size: 25%
+
+# `rmarkdown` = `YAML` + Markdown + R (or other languages)
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 93% 10%
+background-size: 8%
+
+# *What is RMarkdown?*
+
+--
+
+## Three technologies:
+
+--
+
+### 1) Markdown is a plain text markup language for capturing *human-readable* prose
+
+--
+
+### 2) Data manipulation/graphing/statistical language engines for computing *machine-readable* code
+
+--
+
+### 3) Multiple *output options* for creating PDFs, Word docs, PowerPoints, HTML, etc.
+
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Your Turn 1
+
+### Open a new R Markdown file 
+
+.leftcol[
+
+**File** &gt; **New File** &gt; **R Markdown** &gt; **From Template** &gt; **`flexdashboard`**
+
+]
+
+.rightcol[
+
+&lt;img src="img/new-rmd-template.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Your Turn 2
+
+### Add title and save R Markdown file 
+
+&lt;img src="img/title-and-save.png" width="70%" height="70%" style="display: block; margin: auto;" /&gt;
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Your Turn 3
+
+### knit!
+
+&lt;img src="img/knit-flexdashboard.png" width="80%" height="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: center, top
+background-image: url(img/flexdashboard.png)
+background-position: 5% 98%
+background-size: 10%
+
+# What belongs in a dashboard?
+
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+
+&gt; Dashboards are particularly common in **business-style reports**. They can be used to **highlight brief and key summaries of a report**. The layout of a dashboard is often grid-based, with components arranged in boxes of various sizes.
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Dashboard Anatomy
+
+### The YAML header setting creates the dashboard: 
+
+```yaml
+output: 
+  flexdashboard::flex_dashboard:
+```
+
+### The layout is determined by the `orientation` and `vertical_layout` options.
+
+```yaml
+    orientation: columns
+    vertical_layout: fill
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Column Widths
+
+### Column Widths must add up to `1000`
+
+&lt;img src="img/col-width.png" width="70%" height="70%" /&gt;
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Sidebars
+
+.pull-left[
+
+Include a sidebar with `{.sidebar data-width=200}`
+
+&lt;img src="img/input-sidebar.png" width="100%" height="100%" /&gt;
+]
+
+.pull-right[
+
+Adjust the column widths (set both to `{data-width=400}`)
+
+&lt;img src="img/adj-col-width.png" width="100%" height="100%" /&gt;
+
+]
+
+### Knit!
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Sidebars
+
+Sidebars are typically used for data inputs and user-interface controls
+
+&lt;img src="img/input-sidebar-knit.png" width="100%" height="100%" /&gt;
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Row Layout
+
+### We can also orient by rows
+
+Change the `orientation` of the dashboard 
+
+```yaml
+output: 
+  flexdashboard::flex_dashboard:
+      orientation: columns
+```
+
+
+### Re-knit!
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Rows Layout
+
+
+&lt;img src="img/row-orient-knit.png" width="100%" height="100%" /&gt;
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Scrolling
+
+Change the `YAML` header back to `orientation: columns` and `vertical_layout: scroll` 
+
+```yaml
+    orientation: columns
+    vertical_layout: scroll
+```
+
+
+### Re-knit!
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Scrolling
+
+Now we can scroll past the end of the column.
+
+&lt;img src="img/scroll-knit.png" width="100%" height="100%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Tabsets
+
+### Add tabsets with `{.tabset}`
+
+&lt;img src="img/tabset.png" width="100%" height="100%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Global Sidebar and Pages
+
+For global settings, we use `=========` instead of `----------`
+
+&lt;img src="img/global-sidebar-pages-knit-1.png" width="75%" height="75%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+### Global Sidebar and Pages
+
+`data-orientation=columns`
+
+`.tabset`
+
+&lt;img src="img/global-sidebar-pages-knit-1-1.png" width="100%" height="100%" /&gt;
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Global Sidebar and Pages
+
+For global settings, we use `=========` instead of `----------`
+
+&lt;img src="img/global-sidebar-pages-knit-2.png" width="60%" height="60%" /&gt;
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Global Sidebar and Pages
+
+`data-orientation=rows`
+
+`.tabset-fade`
+
+&lt;img src="img/global-sidebar-pages-knit-2-2.png" width="100%" height="100%" /&gt;
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Menus
+
+`data-navmenu=More`
+
+&lt;img src="img/global-sidebar-pages-knit-3.png" width="75%" height="75%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Menus
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;img src="img/global-sidebar-pages-knit-3-3.png" width="90%" height="90%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Themes
+
+### Change `theme`s (just like `html_document`!)
+
+```yaml
+title: "My Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: spacelab
+```
+
+See the website for more information 
+
+
+---
+class: inverse, center, top
+background-image: url(img/inspectdf.png)
+background-position: 50% 70%
+background-size: 35%
+
+# `inspectdf` = quicky examine datasets 
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Previous Slides: Apple Mobility Data 
+
+https://mjfrigaard.github.io/data-viz-as-comm/Index.html
+
+## Import Data
+
+
+```r
+AppleMobRaw &lt;- readr::read_csv("https://bit.ly/36tTVpe")
+```
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Previous Slides: Apple Mobility Data 
+
+### Don't Forget Wrangling Steps!
+
+
+```r
+AppleMobRaw %&gt;% 
+  # transpose data 
+  tidyr::pivot_longer(cols = -c(geo_type:country), 
+    names_to = "date", values_to = "dir_request") %&gt;% 
+    # remove missing country data
+  dplyr::filter(!is.na(country) &amp; !is.na(`sub-region`)) %&gt;% 
+  # clean names
+  janitor::clean_names() %&gt;%
+  # date
+  mutate(date = lubridate::ymd(date)) %&gt;% 
+  # create trans_type
+  rename(trans_type = transportation_type) -&gt; TidyApple
+```
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Dataset size in memory
+
+
+```r
+TidyApple %&gt;%  
+  inspectdf::inspect_mem() %&gt;%  
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+--
+
+&lt;img src="figs/inspect_mem-show-1.png" width="90%" height="90%" /&gt;
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Sidebar
+
+## Add the data to the `.sidebar` 
+
+Add the `import` and `wrangle` code to the sidebar in the dashboard.
+
+
+```r
+# import ----
+AppleMobRaw &lt;- readr::read_csv("https://bit.ly/36tTVpe")
+# wrangle ----
+AppleMobRaw %&gt;% 
+  # transpose data 
+  tidyr::pivot_longer(cols = -c(geo_type:country), 
+    names_to = "date", values_to = "dir_request") %&gt;% 
+    # remove missing country data
+  dplyr::filter(!is.na(country) &amp; !is.na(`sub-region`)) %&gt;% 
+  # clean names
+  janitor::clean_names() %&gt;%
+  # date
+  mutate(date = lubridate::ymd(date)) %&gt;% 
+  # create trans_type
+  rename(trans_type = transportation_type) -&gt; TidyApple
+```
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 1, Tab 1
+
+## Add the '`Memory Size`' Graph
+
+Add this code to `A1`
+
+
+```r
+TidyApple %&gt;%  
+  inspectdf::inspect_mem() %&gt;%  
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 1, Tab 2
+
+## Add the `Missing Data` Graph
+
+Add this code to `A2`
+
+
+```r
+TidyApple %&gt;%
+  inspectdf::inspect_na() %&gt;% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 2, Tab 1
+
+### Add the `Categorical Data` Graph 
+
+Add this code to `B1`
+
+
+```r
+TidyApple %&gt;% 
+  select_if(is.character) %&gt;% 
+  inspectdf::inspect_cat() %&gt;% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 2, Tab 2
+
+### Add the `Data Imbalances` Graph 
+
+Add this code to `B2`
+
+
+```r
+TidyApple %&gt;% 
+  inspectdf::inspect_imb() %&gt;% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1
+
+&lt;img src="img/page-1-sol.png" width="100%" height="100%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Page 2 (Rows)
+
+
+```
+Page 2 {data-orientation=rows}
+=======================================
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Page 2, Row 1, Tab 1
+
+
+### Create a `.tabset`/`.tabset-fade` Row
+
+```
+Row {.tabset .tabset-fade data-height=600}
+---------------------------------------------
+```
+
+### Add `Numeric Data` Graph 
+
+
+```r
+TidyApple %&gt;% 
+  select_if(is.numeric) %&gt;% 
+  inspectdf::inspect_num() %&gt;% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Page 2, Row 1, Tab 2
+
+### Add 'Distributions `ggridges`' Graph 
+
+
+```r
+library(ggridges) 
+lab_ridges &lt;- labs(x = "Apple directions requests",
+                   y = "Transportation Types",
+     title = "Direction Requests by Transportation Type",
+     subtitle = "source: https://covid19.apple.com/mobility")
+
+
+TidyApple %&gt;%
+  ggplot() +
+  geom_density_ridges(aes(x = dir_request, 
+                          y = trans_type,
+    fill = trans_type), 
+    alpha = 1/5) +
+  lab_ridges
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Page 2, Row 2, Tab 1
+
+### Create Another `.tabset`/`.tabset-fade` Row
+
+```
+Row {.tabset .tabset-fade data-height=400}
+----------------------------------------------
+```
+
+### In tab 1, add `TopUSCities` as `paged_table`
+
+
+```r
+TopUSCities &lt;- TidyApple %&gt;% 
+  filter(country == "United States" &amp; 
+           region %in% c("New York City","Los Angeles", 
+                         "Chicago", "Houston", "Phoenix"))
+rmarkdown::paged_table(TopUSCities)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Page 2, Row 2, Tab 2
+
+### In tab 2, add `MaxUSCitiesDriving` as `reactable`
+
+
+
+```r
+TopUSCities %&gt;% 
+  filter(trans_type == "driving") %&gt;% 
+  group_by(region) %&gt;% 
+  slice_max(dir_request) %&gt;% 
+  ungroup() -&gt; MaxUSCitiesDriving
+reactable(MaxUSCitiesDriving, 
+              resizable = TRUE, showPageSizeOptions = TRUE, 
+              selection = "multiple", onClick = "select")
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 2
+
+&lt;img src="img/page-2-sol-1.png" width="100%" height="100%" /&gt;
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 2
+
+&lt;img src="img/page-2-sol-3.png" width="100%" height="100%" /&gt;
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# More Examples 
+
+## Check out the package website and gallery
+
+https://rmarkdown.rstudio.com/flexdashboard/examples.html
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

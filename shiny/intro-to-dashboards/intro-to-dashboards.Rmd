@@ -1,0 +1,952 @@
+---
+title: "Introduction to Dashboards"
+subtitle: "building dashboards with flexdashboard"
+author: "Martin Frigaard"
+institute: "Paradigm Data Group, LLC (PDG)"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css:
+      - default
+      - css/lexis.css
+      - css/lexis-fonts.css
+    lib_dir: libs
+    seal: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+---
+
+```{r meta, echo=FALSE}
+library(metathis)
+meta() %>%
+  meta_general(
+    description = "Introduction to Dashboards",
+    generator = "xaringan and remark.js"
+  ) %>%
+  meta_name("github-repo" = "mjfrigaard/pdg-r/shiny/intro-to-dashboards/") # %>%
+  # meta_social(
+  #   title = "[name of title]",
+  #   url = "[slide link]",
+  #   og_type = "website",
+  #   og_author = "[author]",
+  #   twitter_card_type = "[summary_large_image]",
+  #   twitter_creator = "[@author]"
+  # )
+```
+
+```{r setup, include=FALSE}
+# change this to date written
+dateWritten <- format(as.Date(Sys.Date()), format = "%B %d %Y")
+today <- format(Sys.Date(), format = "%B %d %Y")
+library(knitr)
+library(tidyverse)
+library(fontawesome)
+options(
+    htmltools.dir.version = FALSE,
+    knitr.table.format = "html",
+    knitr.kable.NA = ''
+)
+knitr::opts_chunk$set(
+    warning = FALSE,
+    message = FALSE,
+    fig.path = "figs/",
+    fig.width = 7.252,
+    fig.height = 4,
+    comment = "#>",
+    fig.retina = 3 # Better figure resolution
+)
+# Enables the ability to show all slides in a tile overview by pressing "o"
+xaringanExtra::use_tile_view()
+xaringanExtra::use_panelset()
+xaringanExtra::use_clipboard()
+xaringanExtra::use_share_again()
+xaringanExtra::style_share_again(share_buttons = "all")
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,
+  mute_unhighlighted_code = FALSE
+)
+options(width = 60, 
+        max.print = 60)
+download.file(url = "https://raw.githubusercontent.com/rstudio/hex-stickers/master/thumbs/flexdashboard.png", destfile = "img/flexdashboard.png")
+# infinite rendering
+# xaringan::inf_mr()
+```
+
+layout: true
+
+<!-- this adds the link footer to all slides, depends on footer-small class in css-->
+
+<!-- <div class="footer-small"><span>https://github.com/mjfrigaard/pdg-r/</span></div> -->
+
+---
+name: title-slide
+class: title-slide, center, middle, inverse
+
+# `r rmarkdown::metadata$title`
+#.fancy[`r rmarkdown::metadata$subtitle`]
+
+<br>
+
+.large[by <author>]
+
+Written: `r dateWritten`
+
+Updated: `r today`
+
+---
+class: inverse, center, top
+background-image: url(img/flexdashboard.png)
+background-position: 50% 70%
+background-size: 25%
+
+# `flexdashboard` = Dashboards using R Markdown (and Shiny)
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Load the packages 
+
+<br><br><br><br>
+
+```{r packages, eval=FALSE}
+install.packages(c("tidyverse", "inspectdf", 
+                   "flexdashboard", "reactable"))
+library(tidyverse)
+library(inspectdf)
+library(flexdashboard)
+library(reactable)
+```
+
+```{r pckgs, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(inspectdf)
+library(flexdashboard)
+library(reactable)
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Outline (1)
+
+
+.leftcol[
+
+###  Recap `rmarkdown`
+
+### What belongs in a dashboard?
+
+### Layouts
+
+  - *Sidebars, Columns, and Rows*  
+  - *Multiple Pages, Tabs*
+
+### Themes 
+
+  - *Bootstrap themes* 
+  
+]
+
+.rightcol[
+
+
+### Packages 
+
++ `inspectdf` package 
+
+  - *graphs, syntax* 
+
++ `reactable` package 
+
+  - *table displays*
+
+### Examples with `shiny`
+
+  - *shiny reactivity*
+
+] 
+ 
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Materials
+
+## Slides 
+
+## Exercises 
+
+## RStudio Project
+
+
+---
+class: inverse, center, top
+background-image: url(img/rmarkdown.png)
+background-position: 50% 70%
+background-size: 25%
+
+# `rmarkdown` = `YAML` + Markdown + R (or other languages)
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 93% 10%
+background-size: 8%
+
+# *What is RMarkdown?*
+
+--
+
+## Three technologies:
+
+--
+
+### 1) Markdown is a plain text markup language for capturing *human-readable* prose
+
+--
+
+### 2) Data manipulation/graphing/statistical language engines for computing *machine-readable* code
+
+--
+
+### 3) Multiple *output options* for creating PDFs, Word docs, PowerPoints, HTML, etc.
+
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Your Turn 1
+
+### Open a new R Markdown file 
+
+.leftcol[
+
+**File** > **New File** > **R Markdown** > **From Template** > **`flexdashboard`**
+
+]
+
+.rightcol[
+
+```{r new-rmd-template, echo=FALSE, out.height='80%', out.width='80%', eval=TRUE, fig.align='center'}
+knitr::include_graphics(path = "img/new-rmd-template.png")
+```
+
+]
+
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Your Turn 2
+
+### Add title and save R Markdown file 
+
+```{r title-and-save, echo=FALSE, out.height='70%', out.width='70%', eval=TRUE, fig.align='center'}
+knitr::include_graphics(path = "img/title-and-save.png")
+```
+
+---
+class: left, top
+background-image: url(img/rmarkdown.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Your Turn 3
+
+### knit!
+
+```{r knit-flexdashboard, echo=FALSE, out.height='80%', out.width='80%', eval=TRUE, fig.align='center'}
+knitr::include_graphics(path = "img/knit-flexdashboard.png")
+```
+
+
+---
+class: center, top
+background-image: url(img/flexdashboard.png)
+background-position: 5% 98%
+background-size: 10%
+
+# What belongs in a dashboard?
+
+
+<br><br><br>
+
+> Dashboards are particularly common in **business-style reports**. They can be used to **highlight brief and key summaries of a report**. The layout of a dashboard is often grid-based, with components arranged in boxes of various sizes.
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Dashboard Anatomy
+
+### The YAML header setting creates the dashboard: 
+
+```yaml
+output: 
+  flexdashboard::flex_dashboard:
+```
+
+### The layout is determined by the `orientation` and `vertical_layout` options.
+
+```yaml
+    orientation: columns
+    vertical_layout: fill
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Column Widths
+
+### Column Widths must add up to `1000`
+
+```{r col-width.png, echo=FALSE, out.height='70%', out.width='70%', eval=TRUE}
+knitr::include_graphics(path = "img/col-width.png")
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Sidebars
+
+.pull-left[
+
+Include a sidebar with `{.sidebar data-width=200}`
+
+```{r input-sidebar, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/input-sidebar.png")
+```
+]
+
+.pull-right[
+
+Adjust the column widths (set both to `{data-width=400}`)
+
+```{r adj-col-width, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/adj-col-width.png")
+```
+
+]
+
+### Knit!
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Sidebars
+
+Sidebars are typically used for data inputs and user-interface controls
+
+```{r input-sidebar-knit, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/input-sidebar-knit.png")
+```
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Row Layout
+
+### We can also orient by rows
+
+Change the `orientation` of the dashboard 
+
+```yaml
+output: 
+  flexdashboard::flex_dashboard:
+      orientation: columns
+```
+
+
+### Re-knit!
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Rows Layout
+
+
+```{r row-orient-knit, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/row-orient-knit.png")
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Scrolling
+
+Change the `YAML` header back to `orientation: columns` and `vertical_layout: scroll` 
+
+```yaml
+    orientation: columns
+    vertical_layout: scroll
+```
+
+
+### Re-knit!
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Scrolling
+
+Now we can scroll past the end of the column.
+
+```{r scroll-knit, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/scroll-knit.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Tabsets
+
+### Add tabsets with `{.tabset}`
+
+```{r tabset, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/tabset.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Global Sidebar and Pages
+
+For global settings, we use `=========` instead of `----------`
+
+```{r global-sidebar-pages-knit-1, echo=FALSE, out.height='75%', out.width='75%', eval=TRUE}
+knitr::include_graphics(path = "img/global-sidebar-pages-knit-1.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+### Global Sidebar and Pages
+
+`data-orientation=columns`
+
+`.tabset`
+
+```{r global-sidebar-pages-knit-1-1, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/global-sidebar-pages-knit-1-1.png")
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Global Sidebar and Pages
+
+For global settings, we use `=========` instead of `----------`
+
+```{r global-sidebar-pages-knit-2, echo=FALSE, out.height='60%', out.width='60%', eval=TRUE}
+knitr::include_graphics(path = "img/global-sidebar-pages-knit-2.png")
+```
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Global Sidebar and Pages
+
+`data-orientation=rows`
+
+`.tabset-fade`
+
+```{r global-sidebar-pages-knit-2-2, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/global-sidebar-pages-knit-2-2.png")
+```
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Menus
+
+`data-navmenu=More`
+
+```{r global-sidebar-pages-knit-3, echo=FALSE, out.height='75%', out.width='75%', eval=TRUE}
+knitr::include_graphics(path = "img/global-sidebar-pages-knit-3.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Menus
+
+<br><br>
+
+```{r global-sidebar-pages-knit-3-3, echo=FALSE, out.height='90%', out.width='90%', eval=TRUE}
+knitr::include_graphics(path = "img/global-sidebar-pages-knit-3-3.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Themes
+
+### Change `theme`s (just like `html_document`!)
+
+```yaml
+title: "My Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: spacelab
+```
+
+See the website for more information 
+
+
+---
+class: inverse, center, top
+background-image: url(img/inspectdf.png)
+background-position: 50% 70%
+background-size: 35%
+
+# `inspectdf` = quicky examine datasets 
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Previous Slides: Apple Mobility Data 
+
+https://mjfrigaard.github.io/data-viz-as-comm/Index.html
+
+## Import Data
+
+```{r AppleMobRaw}
+AppleMobRaw <- readr::read_csv("https://bit.ly/36tTVpe")
+```
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Previous Slides: Apple Mobility Data 
+
+### Don't Forget Wrangling Steps!
+
+```{r wrangle-TidyApple}
+AppleMobRaw %>% 
+  # transpose data 
+  tidyr::pivot_longer(cols = -c(geo_type:country), 
+    names_to = "date", values_to = "dir_request") %>% 
+    # remove missing country data
+  dplyr::filter(!is.na(country) & !is.na(`sub-region`)) %>% 
+  # clean names
+  janitor::clean_names() %>%
+  # date
+  mutate(date = lubridate::ymd(date)) %>% 
+  # create trans_type
+  rename(trans_type = transportation_type) -> TidyApple
+```
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+# Dataset size in memory
+
+```{r inspect_mem, out.height='90%', out.width='90%', eval=FALSE}
+TidyApple %>%  
+  inspectdf::inspect_mem() %>%  
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+--
+
+```{r inspect_mem-show, out.height='90%', out.width='90%', echo=FALSE}
+TidyApple %>%  
+  inspectdf::inspect_mem() %>%  
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Sidebar
+
+## Add the data to the `.sidebar` 
+
+Add the `import` and `wrangle` code to the sidebar in the dashboard.
+
+```{r add-sidebar, eval=FALSE}
+# import ----
+AppleMobRaw <- readr::read_csv("https://bit.ly/36tTVpe")
+# wrangle ----
+AppleMobRaw %>% 
+  # transpose data 
+  tidyr::pivot_longer(cols = -c(geo_type:country), 
+    names_to = "date", values_to = "dir_request") %>% 
+    # remove missing country data
+  dplyr::filter(!is.na(country) & !is.na(`sub-region`)) %>% 
+  # clean names
+  janitor::clean_names() %>%
+  # date
+  mutate(date = lubridate::ymd(date)) %>% 
+  # create trans_type
+  rename(trans_type = transportation_type) -> TidyApple
+```
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 1, Tab 1
+
+## Add the '`Memory Size`' Graph
+
+Add this code to `A1`
+
+```{r inspect_mem-code, eval=FALSE}
+TidyApple %>%  
+  inspectdf::inspect_mem() %>%  
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 1, Tab 2
+
+## Add the `Missing Data` Graph
+
+Add this code to `A2`
+
+```{r inspect_na-code, eval=FALSE}
+TidyApple %>%
+  inspectdf::inspect_na() %>% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 2, Tab 1
+
+### Add the `Categorical Data` Graph 
+
+Add this code to `B1`
+
+```{r inspect_cat, eval=FALSE}
+TidyApple %>% 
+  select_if(is.character) %>% 
+  inspectdf::inspect_cat() %>% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1, Column 2, Tab 2
+
+### Add the `Data Imbalances` Graph 
+
+Add this code to `B2`
+
+```{r inspect_imb, eval=FALSE}
+TidyApple %>% 
+  inspectdf::inspect_imb() %>% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/inspectdf.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 1
+
+```{r page-1-sol.png, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/page-1-sol.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Page 2 (Rows)
+
+
+```
+Page 2 {data-orientation=rows}
+=======================================
+```
+
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Page 2, Row 1, Tab 1
+
+
+### Create a `.tabset`/`.tabset-fade` Row
+
+```
+Row {.tabset .tabset-fade data-height=600}
+---------------------------------------------
+```
+
+### Add `Numeric Data` Graph 
+
+```{r inspect_num, eval=FALSE}
+TidyApple %>% 
+  select_if(is.numeric) %>% 
+  inspectdf::inspect_num() %>% 
+  inspectdf::show_plot(text_labels = TRUE)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+## Page 2, Row 1, Tab 2
+
+### Add 'Distributions `ggridges`' Graph 
+
+```{r ggridges, eval=FALSE}
+library(ggridges) 
+lab_ridges <- labs(x = "Apple directions requests",
+                   y = "Transportation Types",
+     title = "Direction Requests by Transportation Type",
+     subtitle = "source: https://covid19.apple.com/mobility")
+
+
+TidyApple %>%
+  ggplot() +
+  geom_density_ridges(aes(x = dir_request, 
+                          y = trans_type,
+    fill = trans_type), 
+    alpha = 1/5) +
+  lab_ridges
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Page 2, Row 2, Tab 1
+
+### Create Another `.tabset`/`.tabset-fade` Row
+
+```
+Row {.tabset .tabset-fade data-height=400}
+----------------------------------------------
+```
+
+### In tab 1, add `TopUSCities` as `paged_table`
+
+```{r TopUSCities, eval=FALSE}
+TopUSCities <- TidyApple %>% 
+  filter(country == "United States" & 
+           region %in% c("New York City","Los Angeles", 
+                         "Chicago", "Houston", "Phoenix"))
+rmarkdown::paged_table(TopUSCities)
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+## Page 2, Row 2, Tab 2
+
+### In tab 2, add `MaxUSCitiesDriving` as `reactable`
+
+
+```{r MaxUSCitiesDriving, eval=FALSE}
+TopUSCities %>% 
+  filter(trans_type == "driving") %>% 
+  group_by(region) %>% 
+  slice_max(dir_request) %>% 
+  ungroup() -> MaxUSCitiesDriving
+reactable(MaxUSCitiesDriving, 
+              resizable = TRUE, showPageSizeOptions = TRUE, 
+              selection = "multiple", onClick = "select")
+```
+
+## Knit--how does it look?
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 2
+
+```{r page-2-sol-1, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/page-2-sol-1.png")
+```
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+
+# Page 2
+
+```{r page-2-sol-3, echo=FALSE, out.height='100%', out.width='100%', eval=TRUE}
+knitr::include_graphics(path = "img/page-2-sol-3.png")
+```
+
+
+---
+class: left, top
+background-image: url(img/flexdashboard.png)
+background-position: 95% 8%
+background-size: 8%
+
+# More Examples 
+
+## Check out the package website and gallery
+
+https://rmarkdown.rstudio.com/flexdashboard/examples.html
+
+```{r chrome_print, eval=FALSE, include=FALSE, echo=FALSE}
+fs::dir_create("pdfs")
+pagedown::chrome_print(input = "Index.html", 
+                       output = "pdfs/intro-to-dashboards-slides.pdf")
+```
+

@@ -1,0 +1,94 @@
+---
+title: "[Title of slide deck]"
+subtitle: "[subtitle for slide deck]"
+author: "[Author Name]"
+institute: "Paradigm Data Group, LLC (PDG)"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css:
+      - default
+      - css/lexis.css
+      - css/lexis-fonts.css
+    lib_dir: libs
+    seal: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+---
+
+```{r meta, echo=FALSE}
+library(metathis)
+meta() %>%
+  meta_general(
+    description = "[slide description <same as title>]",
+    generator = "xaringan and remark.js"
+  ) %>%
+  meta_name("github-repo" = "mjfrigaard/pdg-r/[name of subfolders]") # %>%
+  # meta_social(
+  #   title = "[name of title]",
+  #   url = "[slide link]",
+  #   og_type = "website",
+  #   og_author = "[author]",
+  #   twitter_card_type = "[summary_large_image]",
+  #   twitter_creator = "[@author]"
+  # )
+```
+
+```{r setup, include=FALSE}
+# change this to date written
+dateWritten <- format(as.Date(Sys.Date()), format = "%B %d %Y")
+today <- format(Sys.Date(), format = "%B %d %Y")
+library(knitr)
+library(tidyverse)
+library(fontawesome)
+options(
+    htmltools.dir.version = FALSE,
+    knitr.table.format = "html",
+    knitr.kable.NA = ''
+)
+knitr::opts_chunk$set(
+    warning = FALSE,
+    message = FALSE,
+    fig.path = "figs/",
+    fig.width = 7.252,
+    fig.height = 4,
+    comment = "#>",
+    fig.retina = 3 # Better figure resolution
+)
+# Enables the ability to show all slides in a tile overview by pressing "o"
+xaringanExtra::use_tile_view()
+xaringanExtra::use_panelset()
+xaringanExtra::use_clipboard()
+xaringanExtra::use_share_again()
+xaringanExtra::style_share_again(share_buttons = "all")
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,
+  mute_unhighlighted_code = FALSE
+)
+```
+
+layout: true
+
+<!-- this adds the link footer to all slides, depends on footer-small class in css-->
+
+<div class="footer-small"><span>https://github.com/mjfrigaard/pdg-r/</span></div>
+
+---
+name: title-slide
+class: title-slide, center, middle, inverse
+
+# `r rmarkdown::metadata$title`
+#.fancy[`r rmarkdown::metadata$subtitle`]
+
+<br>
+
+.large[by <author>]
+
+Written: `r dateWritten`
+
+Updated: `r today`
+
+
