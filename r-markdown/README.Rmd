@@ -15,7 +15,9 @@ Our R Markdown training covers the basics of Markdown and `knitr`, table outputs
 
 # Outline
 
-+ R Markdown Anatomy
+<br>
+
+## R Markdown Anatomy
 
   - Why use R Markdown?
 
@@ -25,7 +27,7 @@ Our R Markdown training covers the basics of Markdown and `knitr`, table outputs
 
   - Code (machine readable)
 
-+ Outputs & Tables
+## Outputs & Tables
 
   - Standard output (`tibble`)  
   
@@ -33,7 +35,7 @@ Our R Markdown training covers the basics of Markdown and `knitr`, table outputs
   
   - Table packages (`reactive` + `gt_summary`)
 
-+ Graphs
+## Graphs
 
   - Standard graph outputs  
   
@@ -43,7 +45,7 @@ Our R Markdown training covers the basics of Markdown and `knitr`, table outputs
   
   - Interactive graphs (`plotly`)
 
-+ Data & Workflows
+## Data & Workflows
 
   - Loading data (`setup` and `global` code chunks)  
   

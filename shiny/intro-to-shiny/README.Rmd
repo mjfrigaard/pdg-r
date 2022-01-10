@@ -11,6 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Overview 
 
+Shiny gives us the ability to convert R code into an interactive application, without having to learn HTML, CSS or JavaScript. Shiny applications are incredibly helpful for sharing analysis results with audiences who might not be able to read R. This tutorial will cover an introduction to shiny architecture, common layout options, and application deployment. 
+
+We will also cover `flexdashboard`, a package for creating dashboards built with `rmarkdown`. We'll close by demonstrating how to convert a `flexdashboard` to a shiny application.
+
 ## Shiny app anatomy  
 
 <br>
@@ -19,20 +23,24 @@ knitr::opts_chunk$set(echo = TRUE)
 + `server`
 + `app.R`
 
+<br>
+
 ## User Interface (UI)  
 
 <br>
 
 + layouts  
-  - `fluidPage()`  
-  - `shinydashboard`  
+  - [`fluidPage()`](https://shiny.rstudio.com/reference/shiny/1.4.0/fluidPage.html)  
+  - [`shinydashboard`](https://rstudio.github.io/shinydashboard/)  
   
 + input options  
-  - `sliderInput()`  
-  - `selectInput()`  
-  - `checkboxInput()`  
-  - `textInput()`  
-  - `textAreaInput()`  
+  - [`sliderInput()`](https://shiny.rstudio.com/reference/shiny/1.6.0/sliderInput.html)  
+  - [`selectInput()`](https://shiny.rstudio.com/reference/shiny/1.6.0/selectInput.html)  
+  - [`checkboxInput()`](https://shiny.rstudio.com/reference/shiny/1.6.0/checkboxInput.html)  
+  - [`textInput()`](https://shiny.rstudio.com/reference/shiny/1.6.0/textInput.html)  
+  - [`textAreaInput()`](https://shiny.rstudio.com/reference/shiny/1.6.0/textAreaInput.html)  
+  
+<br>
 
 ## Server  
 
@@ -41,6 +49,8 @@ knitr::opts_chunk$set(echo = TRUE)
 + building `reactive()`s   
 + linking inputs and outputs   
   - `render_*()` functions
+  
+<br>
 
 ## `flexdashboard`  
 
@@ -50,7 +60,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 + What belongs in a dashboard?
 
-## Layouts  
+<br>
+
+## `flexdashboard` Layouts  
 
 <br>
 
@@ -64,13 +76,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - Tabs
 
+<br>
+
 ## `shiny` + `flexdashboard`  
 
 <br>
 
-- Converting from `flexdashboard` to `shiny` app`
+- Converting from `flexdashboard` to `shiny` app
 
 - Combining shiny reactivity with `flexdashboard`
+
+<br>
 
 ## Packages   
   
@@ -84,6 +100,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
   - table displays
   
+<br>
+
 ## Themes   
   
 <br>
